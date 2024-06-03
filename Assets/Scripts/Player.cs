@@ -7,19 +7,38 @@ public class Player : MonoBehaviour
 {
     
     private float _playerSpeed = 7f;
-    [SerializeField]
-    private GameInput _gameInput;
-
-    [SerializeField]
-    private bool isWalking;
-
+    [SerializeField] private GameInput _gameInput;
+    [SerializeField] private bool isWalking;
+    [SerializeField] private LayerMask countersLayerMask;
     private Vector3 lastInteractDir;
     void Start()
     {
-        
+        _gameInput.OnInteractionAction += GameInput_OnInteractionAction;
     }
 
-   
+    private void GameInput_OnInteractionAction(object sender, System.EventArgs e)
+    {
+        Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
+
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+        if (moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir; // creating lastInteractDir because once the player is near the counter, it should continously be there. Which means the ray should be contiusely 
+                                       // hittign the object. We used lastInteractDir variable just so that we can get the hit data continually. This will ensure that the interaction with respective objects will be carry on until the player is near the object
+        }
+        float interactDistance = 2f; // distance between player and counter
+        RaycastHit raycastHit;
+        if (Physics.Raycast(transform.position, lastInteractDir, out raycastHit, interactDistance, countersLayerMask))
+        {
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter)) // TryGetCompnentis better than GetCOmponent as it handles the null check for itself. this same can be written as
+                                                                                     // ClearCounter clearCounter = (raycastHit.transform.GetComponent<ClearCounter>();  
+                                                                                     // if(clearCounter != null)..................
+            {
+                clearCounter.Interact();
+            }
+        }
+    }
+
     void Update()
     {
         HandleMovement();
@@ -38,13 +57,18 @@ public class Player : MonoBehaviour
         if(moveDir != Vector3.zero)
         {
             lastInteractDir = moveDir; // creating lastInteractDir because once the player is near the counter, it should continously be there. Which means the ray should be contiusely 
-                                       // hittign the object
+                                       // hittign the object. We used lastInteractDir variable just so that we can get the hit data continually. This will ensure that the interaction with respective objects will be carry on until the player is near the object
         }
         float interactDistance = 2f; // distance between player and counter
         RaycastHit raycastHit;
-        if (Physics.Raycast(transform.position, lastInteractDir, out raycastHit ,interactDistance))
+        if (Physics.Raycast(transform.position, lastInteractDir, out raycastHit ,interactDistance, countersLayerMask))
         {
-            Debug.Log(raycastHit.transform);
+            if(raycastHit.transform.TryGetComponent(out ClearCounter clearCounter)) // TryGetCompnentis better than GetCOmponent as it handles the null check for itself. this same can be written as
+                                                                                    // ClearCounter clearCounter = (raycastHit.transform.GetComponent<ClearCounter>();  
+                                                                                    // if(clearCounter != null)..................
+            {
+                
+            }
         }
         
     }
