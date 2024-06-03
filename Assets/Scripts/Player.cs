@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private bool isWalking;
+
+    private Vector3 lastInteractDir;
     void Start()
     {
         
@@ -19,6 +21,35 @@ public class Player : MonoBehaviour
 
    
     void Update()
+    {
+        HandleMovement();
+        HandleInteraction();
+    }
+
+    public bool IsWalking()
+    {
+        return isWalking;
+    }
+    private void HandleInteraction()
+    {
+        Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
+
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+        if(moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir; // creating lastInteractDir because once the player is near the counter, it should continously be there. Which means the ray should be contiusely 
+                                       // hittign the object
+        }
+        float interactDistance = 2f; // distance between player and counter
+        RaycastHit raycastHit;
+        if (Physics.Raycast(transform.position, lastInteractDir, out raycastHit ,interactDistance))
+        {
+            Debug.Log(raycastHit.transform);
+        }
+        
+    }
+
+    private void HandleMovement()
     {
         Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
 
@@ -29,8 +60,8 @@ public class Player : MonoBehaviour
         float playerHeight = 2f;
         float playerRadius = 0.7f;
         bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
-        
-        if(!canMove)
+
+        if (!canMove)
         {
             //cannnot move towards moveDir
 
@@ -52,7 +83,7 @@ public class Player : MonoBehaviour
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
                 canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
 
-                if(canMove)
+                if (canMove)
                 {
                     //can move only on the z
                     moveDir = moveDirZ;
@@ -63,7 +94,7 @@ public class Player : MonoBehaviour
                 }
             }
 
-            
+
         }
 
         if (canMove)
@@ -77,11 +108,5 @@ public class Player : MonoBehaviour
         isWalking = moveDir != Vector3.zero;
         float rotateSpeed = 10.0f;
         transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
-
-    }
-
-    public bool IsWalking()
-    {
-        return isWalking;
     }
 }
