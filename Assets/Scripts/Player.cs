@@ -23,7 +23,16 @@ public class Player : MonoBehaviour
         Vector2 inputVector = _gameInput.GetMovementVectorNormalized();
 
         Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
-        transform.position += moveDir * _playerSpeed * Time.deltaTime;
+
+        //checking for the collision based on Raycasting
+        float playerSize = 0.7f;
+        bool canMove = !Physics.Raycast(transform.position, moveDir, playerSize);
+        if (canMove) 
+        {
+            transform.position += moveDir * _playerSpeed * Time.deltaTime;
+        }
+
+        
 
         // the below line basically translates to isWalking = true;
         isWalking = moveDir != Vector3.zero;
