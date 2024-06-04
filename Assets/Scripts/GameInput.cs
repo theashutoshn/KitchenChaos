@@ -23,6 +23,7 @@ public class GameInput : MonoBehaviour
                                                             // {OnInteractionAction(this, EventArgs.Empty);}
     }
 
+
     public Vector2 GetMovementVectorNormalized()
     {
         //Vector2 inputVector = new Vector2(0, 0);
