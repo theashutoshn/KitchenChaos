@@ -82,11 +82,12 @@ public class Player : MonoBehaviour
                     //selectedCounter = clearCounter;
                     SetSelectedCounter(clearCounter);
                 }
-                else // Case 1: If Raycast hit something and that something is not the counter
-                {
-                    //selectedCounter = null;
-                    SetSelectedCounter(null);
-                }
+                
+            }
+            else // Case 1: If Raycast hit something and that something is not the counter
+            {
+                //selectedCounter = null;
+                SetSelectedCounter(null);
             }
         }
         else // Case 2: if Raycast doesn't hit anything, meaing there is nothing in front of player
