@@ -11,10 +11,10 @@ public class Player : MonoBehaviour
     public static Player Instance { get; private set; }
     
 
-    public event EventHandler OnSelectedCounterChanged;
-    public class OnSelectedCounterChangedEventArgs : EventArgs
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+    public class OnSelectedCounterChangedEventArgs : EventArgs //additional event data for storing which counter was selected
     {
-        public ClearCounter selectedCounter;
+        public ClearCounter selectedCounter; // this selectedCounter is different then the below private ClearCounter selectedCounter;
     }
     
     private float _playerSpeed = 7f;
@@ -68,6 +68,8 @@ public class Player : MonoBehaviour
                                        // hittign the object. We used lastInteractDir variable just so that we can get the hit data continually. This will ensure that the interaction with respective objects will be carry on until the player is near the object
         }
         float interactDistance = 2f; // distance between player and counter
+
+
         RaycastHit raycastHit;
         if (Physics.Raycast(transform.position, lastInteractDir, out raycastHit ,interactDistance, countersLayerMask))
         {
@@ -77,20 +79,23 @@ public class Player : MonoBehaviour
             {
                 if(clearCounter != selectedCounter)
                 {
+                    //selectedCounter = clearCounter;
                     SetSelectedCounter(clearCounter);
-                  
                 }
-                else
+                else // Case 1: If Raycast hit something and that something is not the counter
                 {
+                    //selectedCounter = null;
                     SetSelectedCounter(null);
                 }
             }
         }
-        else
+        else // Case 2: if Raycast doesn't hit anything, meaing there is nothing in front of player
         {
+            //selectedCounter = null;
             SetSelectedCounter(null);
         }
 
+        Debug.Log(selectedCounter);
     }
 
     private void HandleMovement()
@@ -150,13 +155,15 @@ public class Player : MonoBehaviour
 
         // the below line basically translates to isWalking = true;
         isWalking = moveDir != Vector3.zero;
+
         float rotateSpeed = 10.0f;
         transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
     }
 
     private void SetSelectedCounter(ClearCounter selectedCounter)
     {
-        this.selectedCounter = selectedCounter;
+        
+        this.selectedCounter = selectedCounter; // This line assigns the value of the parameter selectedCounter to the private field selectedCounter basically, private ClearCounter selectedCounter = clearCounter;
 
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
         {
